@@ -24,10 +24,10 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color:
 
 /* --- マップ（下半分） --- */
 #bottom-area {
-  height: 45%; display: flex; align-items: center; justify-content: space-around; padding: 15px; background-color: #0a0a0a;
+  height: 45%; display: flex; align-items: center; justify-content: space-evenly; padding: 15px; background-color: #0a0a0a;
 }
 #map-container {
-  width: 160px; height: 160px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+  width: 160px; height: 160px; flex-shrink: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
   background-color: #000; border: 2px solid #333; gap: 0;
 }
 .map-cell { position: relative; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; background-color: transparent; }
@@ -56,7 +56,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color:
 }
 
 /* --- コントローラー --- */
-#controller { display: flex; align-items: center; gap: 20px; }
+#controller { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
 .d-pad { display: flex; flex-direction: column; align-items: center; gap: 5px; }
 .d-pad-middle { display: flex; gap: 5px; }
 .btn { background-color: #222; border: 2px solid #444; color: #fff; font-size: 20px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center; }
@@ -69,3 +69,22 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color:
 #clear-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
 #clear-ui h1 { color: #00ffcc; font-size: 50px; margin: 0 0 20px 0; }
 #share-button { background-color: #1da1f2; color: #fff; border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 30px; cursor: pointer; margin-top: 20px; }
+
+/* =========================================
+   ★ スマホ用のレスポンシブデザイン
+   （画面幅が450px以下の場合に自動適用されます）
+   ========================================= */
+@media (max-width: 450px) {
+  /* 上の文字を少し小さく */
+  #room-letter { font-size: 140px; }
+  
+  /* マップを 120px × 120px に縮小 */
+  #map-container { width: 120px; height: 120px; }
+  .map-cell { font-size: 12px; }
+  .player-marker { width: 8px; height: 8px; }
+  
+  /* 十字キーとSWITCHボタンをひとまわり縮小 */
+  .btn.dir { width: 40px; height: 40px; font-size: 16px; }
+  .btn.action { width: 65px; height: 65px; font-size: 12px; }
+  #controller { gap: 10px; }
+}
