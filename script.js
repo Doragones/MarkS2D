@@ -71,7 +71,6 @@ function updateView() {
     if (currentRoom.isSwitchOn) {
       roomLetter.style.color = '#000';
       roomOverlay.style.backgroundColor = '#00ffcc';
-      // ★ V,W,X,Y,Z の部屋なら丸(半濁点)、それ以外は斜線(濁点)
       const isCircle = "VWXYZ".includes(currentRoom.letter);
       roomOverlay.className = isCircle ? 'switch-on-circle' : 'switch-on-slash';
     } else {
@@ -153,7 +152,6 @@ function handleAction() {
   const currentRoom = gameState.rooms.find(r => r.x === gameState.x && r.z === gameState.z);
   
   if (currentRoom.letter === 'A') {
-    // ★ 正解判定（E, G, P がONになっているか）
     const onRoomLetters = gameState.rooms.filter(r => r.isSwitchOn).map(r => r.letter);
     const correctLetters = ['E', 'G', 'P'];
     
@@ -180,9 +178,8 @@ function handleAction() {
   }
 }
 
-// PC用キーボード操作（スクロール防止付き）
+// PC用キーボード操作
 document.addEventListener('keydown', (e) => {
-  // ★矢印キーとスペースキーを押した時だけ、ブラウザの標準動作（スクロール）をキャンセル
   if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(e.code)) {
     e.preventDefault();
   }
@@ -192,12 +189,16 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft' || e.key === 'a') move('w');
   if (e.key === 'ArrowRight' || e.key === 'd') move('e');
   if (e.code === 'Space') { handleAction(); }
-}, { passive: false }); // preventDefaultを確実に効かせるための設定
+}, { passive: false });
 
 // シェアボタン
 document.getElementById('share-button').addEventListener('click', () => {
-  const gameUrl = window.location.href;
+  const urlParams = new URLSearchParams(window.location.search);
+  const customUrl = urlParams.get('shareUrl');
+  const gameUrl = customUrl || (document.referrer ? document.referrer : window.location.href);
+  
   const tweetText = `『MarkS』をクリアしました！\n🕹️ トグル操作回数：${gameState.toggleCount} 回\n\n${gameUrl}\n\n#Web謎 #謎解き #MarkS謎`;
+  
   window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`, '_blank');
 });
 
