@@ -1,0 +1,71 @@
+/* --- 全体設定 --- */
+* { box-sizing: border-box; touch-action: manipulation; }
+body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #000; font-family: 'Montserrat', sans-serif; overflow: hidden; }
+
+#game-container {
+  display: flex; flex-direction: column; height: 100vh; max-width: 500px; margin: 0 auto; background-color: #111;
+}
+
+/* --- 部屋ビュー（上半分） --- */
+#room-view {
+  flex: 1; position: relative; display: flex; align-items: center; justify-content: center;
+  border-bottom: 2px solid #333; cursor: pointer; overflow: hidden;
+}
+#room-letter { font-size: 180px; font-weight: 900; color: #fff; z-index: 2; transition: color 0.3s; }
+#room-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; transition: background-color 0.3s; }
+
+/* 解答モニター用 */
+#terminal-view { position: absolute; z-index: 3; text-align: center; color: #00ffcc; display: flex; flex-direction: column; gap: 10px; }
+.sys-text { font-size: 20px; font-weight: 900; }
+.sys-sub { font-size: 14px; color: #888; }
+.emoji-dogeza { font-size: 80px; line-height: 1; margin: 10px 0; }
+#password-display { font-size: 24px; letter-spacing: 3px; }
+#terminal-msg { height: 20px; font-size: 14px; color: #ff0000; }
+
+/* --- マップ（下半分） --- */
+#bottom-area {
+  height: 45%; display: flex; align-items: center; justify-content: space-around; padding: 15px; background-color: #0a0a0a;
+}
+#map-container {
+  width: 160px; height: 160px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+  background-color: #000; border: 2px solid #333; gap: 0;
+}
+.map-cell { position: relative; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; background-color: transparent; }
+.map-cell.seen { background-color: #1a1a1a; border: 1px dotted #333; color: #555; }
+.map-cell.visited { background-color: #000; color: #00ffcc; }
+.map-cell.current { background-color: rgba(0, 255, 204, 0.2); }
+
+.player-marker {
+  width: 10px; height: 10px; background-color: #fff; border-radius: 50%; position: absolute;
+  box-shadow: 0 0 10px #fff, 0 0 4px #00ffcc;
+}
+
+/* ★ 濁点：ストライプ */
+.switch-on-slash {
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(0,255,204,0.6) 3px, rgba(0,255,204,0.6) 5px);
+}
+
+/* ★ 半濁点：中空きの丸（線だけの円）が互い違いに並ぶ柄 */
+.switch-on-circle {
+  background-color: transparent;
+  background-image:
+    radial-gradient(circle, transparent 2.5px, rgba(0,255,204,0.7) 2.5px, rgba(0,255,204,0.7) 4px, transparent 4px),
+    radial-gradient(circle, transparent 2.5px, rgba(0,255,204,0.7) 2.5px, rgba(0,255,204,0.7) 4px, transparent 4px);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 8px;
+}
+
+/* --- コントローラー --- */
+#controller { display: flex; align-items: center; gap: 20px; }
+.d-pad { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.d-pad-middle { display: flex; gap: 5px; }
+.btn { background-color: #222; border: 2px solid #444; color: #fff; font-size: 20px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center; }
+.btn:active { background-color: #555; transform: scale(0.95); }
+.btn.dir { width: 50px; height: 50px; }
+.btn.action { width: 80px; height: 80px; border-color: #00ffcc; color: #00ffcc; font-size: 16px; border-radius: 50%; }
+.btn.action:active { background-color: rgba(0, 255, 204, 0.3); }
+
+/* --- クリア画面 --- */
+#clear-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
+#clear-ui h1 { color: #00ffcc; font-size: 50px; margin: 0 0 20px 0; }
+#share-button { background-color: #1da1f2; color: #fff; border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 30px; cursor: pointer; margin-top: 20px; }

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MarkS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-container">
+    
+    <div id="room-view" onclick="handleAction()">
+      <div id="room-letter">A</div>
+      <div id="room-overlay"></div>
+      
+      <div id="terminal-view" style="display: none;">
+        <div class="sys-text">ERROR: SYSTEM LOCKED.</div>
+        <div class="sys-sub">REQUIREMENT:</div>
+        <div class="emoji-dogeza">🙇</div>
+        <div id="password-display">[ &nbsp; ] [ &nbsp; ] [ &nbsp; ]</div>
+        <div id="terminal-msg"></div>
+      </div>
+    </div>
+
+    <div id="bottom-area">
+      <div id="map-container"></div>
+      <div id="controller">
+        <div class="d-pad">
+          <button class="btn dir" onclick="move('n')">▲</button>
+          <div class="d-pad-middle">
+            <button class="btn dir" onclick="move('w')">◀</button>
+            <button class="btn dir" onclick="move('s')">▼</button>
+            <button class="btn dir" onclick="move('e')">▶</button>
+          </div>
+        </div>
+        <div class="action-pad">
+          <button class="btn action" id="action-btn" onclick="handleAction()">SWITCH</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="clear-ui" style="display: none;">
+      <h1>CLEAR!</h1>
+      <p>『MarkS』のシステムを解除しました。</p>
+      <p id="result-stats"></p>
+      <button id="share-button">X でシェア</button>
+    </div>
+
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
