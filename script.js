@@ -180,14 +180,19 @@ function handleAction() {
   }
 }
 
-// PC用キーボード操作
+// PC用キーボード操作（スクロール防止付き）
 document.addEventListener('keydown', (e) => {
+  // ★矢印キーとスペースキーを押した時だけ、ブラウザの標準動作（スクロール）をキャンセル
+  if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(e.code)) {
+    e.preventDefault();
+  }
+  
   if (e.key === 'ArrowUp' || e.key === 'w') move('n');
   if (e.key === 'ArrowDown' || e.key === 's') move('s');
   if (e.key === 'ArrowLeft' || e.key === 'a') move('w');
   if (e.key === 'ArrowRight' || e.key === 'd') move('e');
-  if (e.code === 'Space') { e.preventDefault(); handleAction(); }
-});
+  if (e.code === 'Space') { handleAction(); }
+}, { passive: false }); // preventDefaultを確実に効かせるための設定
 
 // シェアボタン
 document.getElementById('share-button').addEventListener('click', () => {
