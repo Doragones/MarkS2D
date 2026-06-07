@@ -75,22 +75,26 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color:
    （画面幅が450px以下の場合に自動適用されます）
    ========================================= */
 @media (max-width: 450px) {
-  /* 上の文字を少し小さく */
-  #room-letter { font-size: 140px; }
+  /* 上の文字サイズを微調整 */
+  #room-letter { font-size: 130px; }
   
-  /* ★追加：マップとコントローラーを「両端寄せ」にして窮屈さを解消 */
+  /* ★ 左右の窮屈さを解消する配置設定 */
   #bottom-area {
-    justify-content: space-between;
-    padding: 10px 25px; /* 左右の壁から少し離す */
+    justify-content: center; /* 両端寄せをやめて中央揃えに */
+    gap: 15px; /* マップとコントローラーの間に「絶対的な隙間」を確保 */
+    padding: 10px 5px; /* 画面端の無駄な余白を減らす */
   }
   
-  /* マップを縮小 */
-  #map-container { width: 120px; height: 120px; }
-  .map-cell { font-size: 12px; }
-  .player-marker { width: 8px; height: 8px; }
+  /* ★ マップをさらに少しコンパクトに */
+  #map-container { width: 105px; height: 105px; }
+  .map-cell { font-size: 11px; }
+  .player-marker { width: 7px; height: 7px; }
   
-  /* 十字キーとSWITCHボタンをひとまわり縮小 */
-  .btn.dir { width: 40px; height: 40px; font-size: 16px; }
-  .btn.action { width: 65px; height: 65px; font-size: 12px; }
+  /* ★ コントローラーを画面幅に確実におさまるサイズに */
+  .btn.dir { width: 36px; height: 36px; font-size: 14px; }
+  .d-pad { gap: 4px; }
+  .d-pad-middle { gap: 4px; }
+  
+  .btn.action { width: 58px; height: 58px; font-size: 11px; }
   #controller { gap: 10px; }
 }
