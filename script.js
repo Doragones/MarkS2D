@@ -60,6 +60,7 @@ function updateView() {
   if (currentRoom.letter === 'A') {
     roomLetter.style.display = 'none';
     roomOverlay.style.backgroundColor = 'transparent';
+    roomOverlay.className = '';
     terminalView.style.display = 'flex';
     actionBtn.textContent = 'SEND';
   } else {
