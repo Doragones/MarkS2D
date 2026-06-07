@@ -56,7 +56,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color:
 }
 
 /* --- コントローラー --- */
-#controller { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
+#controller { display: flex; align-items: center; gap: 15px; flex-shrink: 0; }
 .d-pad { display: flex; flex-direction: column; align-items: center; gap: 5px; }
 .d-pad-middle { display: flex; gap: 5px; }
 .btn { background-color: #222; border: 2px solid #444; color: #fff; font-size: 20px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center; }
