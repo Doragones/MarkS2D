@@ -1,53 +1,35 @@
 const gameState = {
-  x: -1, z: 0, // Aの部屋からスタート
+  x: -1, z: 0, // Aの部屋（左外）からスタート
   toggleCount: 0,
   rooms: []
 };
 
-// 迷路内の25部屋は B から Z
+// 迷路内の25部屋 (B 〜 Z)
 const gridLetters = "BCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-// --- 迷路データの生成 ---
+// --- 1. 部屋データの生成（外枠だけ壁を作る） ---
 for (let i = 0; i < 25; i++) {
   let px = i % 5;
   let pz = Math.floor(i / 5);
   gameState.rooms.push({
-    id: i + 1,
-    letter: gridLetters[i],
-    x: px, z: pz,
+    id: i + 1, letter: gridLetters[i], x: px, z: pz,
     isSwitchOn: false, isVisited: false, isSeen: false,
+    // ★ 5x5の外周だけを「壁(true)」にし、内部はすべて開通(false)させる
     walls: { n: pz === 0, s: pz === 4, e: px === 4, w: px === 0 }
   });
 }
-
-// Aの部屋（Answer / スタート地点）
+// Aの部屋（スタート＆解答地点）
 gameState.rooms.push({
   id: 0, letter: 'A', x: -1, z: 0,
   isSwitchOn: false, isVisited: false, isSeen: false,
-  walls: { n: true, s: true, e: false, w: true }
+  walls: { n: true, s: true, e: false, w: true } // 東（右）だけ開ける
 });
 
 // Bの部屋（x:0, z:0）の西（左）の壁を壊してAと繋げる
-const roomB = gameState.rooms.find(r => r.x === 0 && r.z === 0);
+const roomB = gameState.rooms.find(r => r.letter === 'B');
 if (roomB) roomB.walls.w = false;
 
-// 内部の壁生成
-function addWall(x, z, dir) {
-  const r1 = gameState.rooms.find(r => r.x === x && r.z === z);
-  if (dir === 'e') {
-    const r2 = gameState.rooms.find(r => r.x === x + 1 && r.z === z);
-    if(r1 && r2) { r1.walls.e = true; r2.walls.w = true; }
-  }
-  if (dir === 's') {
-    const r2 = gameState.rooms.find(r => r.x === x && r.z === z + 1);
-    if(r1 && r2) { r1.walls.s = true; r2.walls.n = true; }
-  }
-}
-addWall(1, 0, 's'); addWall(3, 0, 's'); addWall(1, 1, 'e'); addWall(2, 1, 'e');
-addWall(0, 2, 'e'); addWall(3, 2, 'e'); addWall(1, 2, 's'); addWall(3, 2, 's');
-addWall(1, 3, 'e'); addWall(2, 3, 's');
-
-// --- 描画更新 ---
+// --- 2. 描画更新 ---
 function updateView() {
   const currentRoom = gameState.rooms.find(r => r.x === gameState.x && r.z === gameState.z);
   if (!currentRoom) return;
@@ -59,32 +41,40 @@ function updateView() {
 
   if (currentRoom.letter === 'A') {
     roomLetter.style.display = 'none';
-    roomOverlay.style.backgroundColor = 'transparent';
-    roomOverlay.className = '';
+    roomOverlay.style.opacity = '0'; 
     terminalView.style.display = 'flex';
     actionBtn.textContent = 'SEND';
+    document.getElementById('terminal-msg').innerHTML = ''; 
   } else {
     terminalView.style.display = 'none';
     roomLetter.style.display = 'block';
     roomLetter.textContent = currentRoom.letter;
     actionBtn.textContent = 'SWITCH';
     
+    // ★ 模様のクラスだけをセットし、ベタ塗り（背景色）は透明にしておく
+    const isCircle = "VWXYZ".includes(currentRoom.letter);
+    roomOverlay.className = isCircle ? 'switch-on-circle' : 'switch-on-slash';
+    roomOverlay.style.backgroundColor = 'transparent'; // ← これで塗りつぶしを防止！
+
     if (currentRoom.isSwitchOn) {
-      roomLetter.style.color = '#000';
-      roomOverlay.style.backgroundColor = '#00ffcc';
-      const isCircle = "VWXYZ".includes(currentRoom.letter);
-      roomOverlay.className = isCircle ? 'switch-on-circle' : 'switch-on-slash';
+      roomLetter.style.color = '#000'; // 黒文字のシルエット
+      roomOverlay.style.opacity = '1'; // フワッと模様だけが浮かび上がる
     } else {
-      roomLetter.style.color = '#fff';
-      roomOverlay.style.backgroundColor = 'transparent';
-      roomOverlay.className = '';
+      roomLetter.style.color = '#fff'; // 白文字
+      roomOverlay.style.opacity = '0'; // フワッと消える
     }
   }
 
+  // 視界の更新：現在地を訪問済みにし、十字方向のみ Seen にする
   currentRoom.isVisited = true;
-  currentRoom.isSeen = true;
   gameState.rooms.forEach(r => {
-    if (Math.abs(r.x - gameState.x) <= 1 && Math.abs(r.z - gameState.z) <= 1) r.isSeen = true;
+    if (r.isVisited) {
+      const neighbors = gameState.rooms.filter(n => 
+        (Math.abs(n.x - r.x) === 1 && n.z === r.z) || 
+        (n.x === r.x && Math.abs(n.z - r.z) === 1)
+      );
+      neighbors.forEach(n => n.isSeen = true);
+    }
   });
 
   const mapContainer = document.getElementById('map-container');
@@ -101,10 +91,12 @@ function updateView() {
       if (room) {
         if (room.isVisited) {
           cell.classList.add('visited');
-          cell.style.borderTop = room.walls.n ? '2px solid #00ffcc' : '1px dashed #333';
-          cell.style.borderBottom = room.walls.s ? '2px solid #00ffcc' : '1px dashed #333';
-          cell.style.borderLeft = room.walls.w ? '2px solid #00ffcc' : '1px dashed #333';
-          cell.style.borderRight = room.walls.e ? '2px solid #00ffcc' : '1px dashed #333';
+          
+          // ★ 外壁は「太いシアン」、内部のマス目は「暗いグレーの点線」で描画
+          cell.style.borderTop = room.walls.n ? '2px solid #00ffcc' : '1px dotted #333';
+          cell.style.borderBottom = room.walls.s ? '2px solid #00ffcc' : '1px dotted #333';
+          cell.style.borderLeft = room.walls.w ? '2px solid #00ffcc' : '1px dotted #333';
+          cell.style.borderRight = room.walls.e ? '2px solid #00ffcc' : '1px dotted #333';
 
           if (room.isSwitchOn && room.letter !== 'A') {
             const isCircle = "VWXYZ".includes(room.letter);
@@ -127,19 +119,24 @@ function updateView() {
   }
 }
 
-// --- 移動ロジック ---
+// --- 3. 移動ロジック（壁を無視し、座標の限界値だけで判定） ---
 function move(dir) {
-  const currentRoom = gameState.rooms.find(r => r.x === gameState.x && r.z === gameState.z);
-  if (!currentRoom) return;
-
   let nextX = gameState.x;
   let nextY = gameState.z;
-  let canMove = true;
+  let canMove = false;
 
-  if (dir === 'n') { if (currentRoom.walls.n) { canMove = false; } else { nextY--; } }
-  if (dir === 's') { if (currentRoom.walls.s) { canMove = false; } else { nextY++; } }
-  if (dir === 'e') { if (currentRoom.walls.e) { canMove = false; } else { nextX++; } }
-  if (dir === 'w') { if (currentRoom.walls.w) { canMove = false; } else { nextX--; } }
+  if (dir === 'n') nextY--;
+  if (dir === 's') nextY++;
+  if (dir === 'e') nextX++;
+  if (dir === 'w') nextX--;
+
+  // メインの5x5グリッド内の移動なら許可
+  if (nextX >= 0 && nextX <= 4 && nextY >= 0 && nextY <= 4) {
+    canMove = true;
+  }
+  // Aの部屋 (-1, 0) への移動・退出ロジック
+  if (nextX === -1 && nextY === 0) canMove = true;
+  if (gameState.x === -1 && gameState.z === 0 && dir !== 'e') canMove = false; // Aからは東にしか行けない
 
   if (canMove) {
     gameState.x = nextX;
@@ -148,29 +145,34 @@ function move(dir) {
   }
 }
 
-// --- アクション（スイッチ＆送信） ---
+// --- 4. アクション（絶妙なヒント出し） ---
 function handleAction() {
   const currentRoom = gameState.rooms.find(r => r.x === gameState.x && r.z === gameState.z);
   
   if (currentRoom.letter === 'A') {
-    const onRoomLetters = gameState.rooms.filter(r => r.isSwitchOn).map(r => r.letter);
+    const onRooms = gameState.rooms.filter(r => r.isSwitchOn);
+    const onLetters = onRooms.map(r => r.letter);
     const correctLetters = ['E', 'G', 'P'];
     
-    const isCorrect = (correctLetters.length === onRoomLetters.length) && 
-                      correctLetters.every(l => onRoomLetters.includes(l));
+    const isCorrect = (correctLetters.length === onLetters.length) && 
+                      correctLetters.every(l => onLetters.includes(l));
                       
     const msgElement = document.getElementById('terminal-msg');
 
     if (isCorrect) {
       msgElement.style.color = '#00ffcc';
-      msgElement.textContent = 'ACCESS GRANTED.';
+      msgElement.innerHTML = '<br>ACCESS GRANTED.'; // 中央に寄せるための改行
       setTimeout(() => {
         document.getElementById('result-stats').innerHTML = `🕹️ トグル操作回数：${gameState.toggleCount} 回`;
         document.getElementById('clear-ui').style.display = 'flex';
       }, 1000);
     } else {
+      // ★ ここが絶妙なヒント！ 何個のスイッチがONで、どの模様が適用されているかを教える
+      const circles = onRooms.filter(r => "VWXYZ".includes(r.letter)).length;
+      const slashes = onRooms.length - circles;
+      
       msgElement.style.color = '#ff0000';
-      msgElement.textContent = 'ERROR: INVALID INPUT.';
+      msgElement.innerHTML = `INPUT DETECTED: ${onRooms.length}<br>MODIFIER: [//] x${slashes} &nbsp; [〇] x${circles}<br>ERROR: SEQUENCE INVALID.`;
     }
   } else {
     currentRoom.isSwitchOn = !currentRoom.isSwitchOn;
@@ -179,12 +181,11 @@ function handleAction() {
   }
 }
 
-// PC用キーボード操作
+// --- 5. イベントリスナー周り（そのまま） ---
 document.addEventListener('keydown', (e) => {
   if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(e.code)) {
     e.preventDefault();
   }
-  
   if (e.key === 'ArrowUp' || e.key === 'w') move('n');
   if (e.key === 'ArrowDown' || e.key === 's') move('s');
   if (e.key === 'ArrowLeft' || e.key === 'a') move('w');
@@ -192,16 +193,12 @@ document.addEventListener('keydown', (e) => {
   if (e.code === 'Space') { handleAction(); }
 }, { passive: false });
 
-// シェアボタン
 document.getElementById('share-button').addEventListener('click', () => {
   const urlParams = new URLSearchParams(window.location.search);
   const customUrl = urlParams.get('shareUrl');
   const gameUrl = customUrl || (document.referrer ? document.referrer : window.location.href);
-  
   const tweetText = `『MarkS』をクリアしました！\n🕹️ トグル操作回数：${gameState.toggleCount} 回\n\n${gameUrl}\n\n#Web謎 #謎解き #MarkS謎`;
-  
   window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`, '_blank');
 });
 
-// 初期描画
 updateView();
