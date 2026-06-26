@@ -12,7 +12,11 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color:
   border-bottom: 2px solid #333; cursor: pointer; overflow: hidden;
 }
 #room-letter { font-size: 180px; font-weight: 900; color: #fff; z-index: 2; transition: color 0.3s; }
-#room-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; transition: background-color 0.3s; }
+#room-overlay {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
+  opacity: 0; /* ★ 普段は完全に透明にして隠しておく */
+  transition: opacity 0.3s ease; /* ★ 0.3秒かけてフワッと透明度を変化させる */
+}
 
 /* 解答モニター用 */
 #terminal-view { position: absolute; z-index: 3; text-align: center; color: #00ffcc; display: flex; flex-direction: column; gap: 10px; }
@@ -20,18 +24,30 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color:
 .sys-sub { font-size: 14px; color: #888; }
 .emoji-dogeza { font-size: 80px; line-height: 1; margin: 10px 0; }
 #password-display { font-size: 24px; letter-spacing: 3px; }
-#terminal-msg { height: 20px; font-size: 14px; color: #ff0000; }
+#terminal-msg { 
+  height: 60px; /* 3行表示できるように高さを広げる */
+  font-size: 13px; color: #ff0000; 
+  line-height: 1.4; text-align: center;
+}
 
 /* --- マップ（下半分） --- */
 #bottom-area {
   height: 45%; display: flex; align-items: center; justify-content: space-evenly; padding: 15px; background-color: #0a0a0a;
 }
 #map-container {
-  width: 160px; height: 160px; flex-shrink: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
-  background-color: #000; border: 2px solid #333; gap: 0;
+  width: 160px; height: 160px;
+  flex-shrink: 0;
+  display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+  background-color: #000;
+  border: 2px solid #333; 
+  gap: 0; /* ★ 隙間をなくす（ボーダーで区切るため） */
 }
-.map-cell { position: relative; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; background-color: transparent; }
-.map-cell.seen { background-color: #1a1a1a; border: 1px dotted #333; color: #555; }
+.map-cell { 
+  position: relative; display: flex; align-items: center; justify-content: center; 
+  font-size: 14px; font-weight: bold; 
+  background-color: transparent; /* ★ 探索前は完全透明に */
+}
+.map-cell.seen { background-color: #111; color: #555; border: 1px dotted #333; }
 .map-cell.visited { background-color: #000; color: #00ffcc; }
 .map-cell.current { background-color: rgba(0, 255, 204, 0.2); }
 
@@ -40,19 +56,27 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color:
   box-shadow: 0 0 10px #fff, 0 0 4px #00ffcc;
 }
 
-/* ★ 濁点：ストライプ */
+/* ★ 濁点：目に優しい太めのストライプ */
 .switch-on-slash {
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(0,255,204,0.6) 3px, rgba(0,255,204,0.6) 5px);
+  background-image: repeating-linear-gradient(
+    45deg, 
+    transparent, 
+    transparent 12px, 
+    rgba(0, 255, 204, 0.6) 12px, 
+    rgba(0, 255, 204, 0.6) 18px
+  );
 }
 
-/* ★ 半濁点：中空きの丸（線だけの円）が互い違いに並ぶ柄 */
+/* ★ 半濁点：重ならないように間隔を広げた、独立した中空き丸 */
 .switch-on-circle {
   background-color: transparent;
+  /* 円のサイズはそのままに、アンチエイリアス（滑らかさ）を維持 */
   background-image:
-    radial-gradient(circle, transparent 2.5px, rgba(0,255,204,0.7) 2.5px, rgba(0,255,204,0.7) 4px, transparent 4px),
-    radial-gradient(circle, transparent 2.5px, rgba(0,255,204,0.7) 2.5px, rgba(0,255,204,0.7) 4px, transparent 4px);
-  background-size: 16px 16px;
-  background-position: 0 0, 8px 8px;
+    radial-gradient(circle, transparent 8px, rgba(0, 255, 204, 0.65) 8.5px, rgba(0, 255, 204, 0.65) 12px, transparent 12.5px),
+    radial-gradient(circle, transparent 8px, rgba(0, 255, 204, 0.65) 8.5px, rgba(0, 255, 204, 0.65) 12px, transparent 12.5px);
+  /* ★ ここがポイント：配置間隔を 30px → 40px に広げて重なりをなくす */
+  background-size: 40px 40px;
+  background-position: 0 0, 20px 20px;
 }
 
 /* --- コントローラー --- */
