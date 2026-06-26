@@ -51,17 +51,17 @@ function updateView() {
     roomLetter.textContent = currentRoom.letter;
     actionBtn.textContent = 'SWITCH';
     
-    // ★ 模様のクラスだけをセットし、ベタ塗り（背景色）は透明にしておく
+    // ★修正：余計な backgroundColor の指定を完全に削除！
+    // 模様のクラスだけをシンプルに切り替えます
     const isCircle = "VWXYZ".includes(currentRoom.letter);
     roomOverlay.className = isCircle ? 'switch-on-circle' : 'switch-on-slash';
-    roomOverlay.style.backgroundColor = 'transparent'; // ← これで塗りつぶしを防止！
 
     if (currentRoom.isSwitchOn) {
       roomLetter.style.color = '#000'; // 黒文字のシルエット
-      roomOverlay.style.opacity = '1'; // フワッと模様だけが浮かび上がる
+      roomOverlay.style.opacity = '1';  // じわっと表示
     } else {
       roomLetter.style.color = '#fff'; // 白文字
-      roomOverlay.style.opacity = '0'; // フワッと消える
+      roomOverlay.style.opacity = '0';  // じわっと消える
     }
   }
 
